@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Humanizer Pro</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/animations.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>🦾→👤 AI Humanizer Pro</h1>
+            <div class="toolbar">
+                <select id="languageSelect" class="select-language">
+                    <option value="es">Español</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </header>
+
+        <main class="editor-container">
+            <div class="input-section">
+                <div class="text-editor" contenteditable id="inputEditor" 
+                     data-placeholder="Pega tu texto AI aquí..."></div>
+                <div class="file-upload">
+                    <input type="file" id="fileInput" accept=".txt">
+                    <label for="fileInput" class="btn-upload">📁 Subir archivo</label>
+                </div>
+            </div>
+
+            <div class="processing-controls">
+                <button class="btn-process" id="processBtn">
+                    <span class="btn-loader"></span>
+                    Humanizar Texto
+                </button>
+                <div class="processing-options">
+                    <label class="option-item">
+                        <input type="checkbox" name="simplify" checked>
+                        Simplificar vocabulario
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" name="punctuation" checked>
+                        Corregir puntuación
+                    </label>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="result-stats">
+                    <span class="stat-item">📝 <span id="charCount">0</span> caracteres</span>
+                    <span class="stat-item">🔄 <span id="changesCount">0</span> cambios</span>
+                </div>
+                <div class="text-output" contenteditable id="outputEditor"></div>
+                <button class="btn-copy" id="copyBtn">📋 Copiar</button>
+            </div>
+        </main>
+
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <script src="./js/uiManager.js" type="module"></script>
+    <script src="./js/main.js" type="module"></script>
+</body>
+</html>
