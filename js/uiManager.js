@@ -1,41 +1,51 @@
 export class UIManager {
-    static init() {
+    static init(processHandler) {
+        this.processHandler = processHandler;
         this.bindEvents();
         this.setupServiceWorker();
     }
 
     static bindEvents() {
-        document.getElementById('processBtn').addEventListener('click', () => this.toggleLoading(true));
-        document.getElementById('copyBtn').addEventListener('click', () => this.copyText());
-        document.getElementById('fileInput').addEventListener('change', e => this.handleFile(e));
-    }
+        document.getElementById('processBtn').addEventListener('click', () => {
+            const text = document.getElementById('inputEditor').textContent;
+            const options = {
+                simplify: document.querySelector('[name="simplify"]').checked,
+                punctuation: document.querySelector('[name="punctuation"]').checked
+            };
+            this.processHandler(text, options);
+        });
 
-    static showResult(text) {
-        const output = document.getElementById('outputEditor');
-        output.textContent = text;
-        output.classList.add('slide-enter-active');
-        this.toggleLoading(false);
-    }
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const text = document.getElementById('outputEditor').textContent;
+            navigator.clipboard.writeText(text);
+            alert('Texto copiado al portapapeles');
+        });
 
-    static showError(error) {
-        console.error(error);
-        this.toggleLoading(false);
-        alert(`Error: ${error}`);
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            const text = await file.text();
+            document.getElementById('inputEditor').textContent = text;
+        });
     }
 
     static toggleLoading(show) {
         document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
     }
 
-    static async handleFile(event) {
-        const file = event.target.files[0];
-        const text = await file.text();
-        document.getElementById('inputEditor').textContent = text;
+    static updateProgress(progress) {
+        const progressBar = document.querySelector('.progress');
+        progressBar.style.width = `${progress * 100}%`;
     }
 
-    static copyText() {
-        const text = document.getElementById('outputEditor').textContent;
-        navigator.clipboard.writeText(text);
+    static showResult(text) {
+        document.getElementById('outputEditor').textContent = text;
+        this.toggleLoading(false);
+    }
+
+    static showError(error) {
+        console.error(error);
+        alert(`Error: ${error}`);
+        this.toggleLoading(false);
     }
 
     static setupServiceWorker() {
