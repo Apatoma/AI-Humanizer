@@ -1,29 +1,45 @@
 import { UIManager } from './uiManager.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    UIManager.init();
-    
-    const worker = new Worker('./js/textWorker.js');
-    
-    worker.onmessage = (e) => {
-        if (e.data.error) {
-            console.error(e.data.error);
-            UIManager.showError(e.data.error);
-        } else {
-            UIManager.showResult(e.data);
-        }
-    };
+class App {
+    static init() {
+        this.worker = new Worker('./js/textWorker.js');
+        this.setupWorker();
+        UIManager.init(this.handleProcess.bind(this));
+    }
 
-    document.getElementById('processBtn').addEventListener('click', () => {
-        const inputText = document.getElementById('inputEditor').textContent;
-        const options = {
-            simplify: document.querySelector('[name="simplify"]').checked,
-            punctuation: document.querySelector('[name="punctuation"]').checked
+    static setupWorker() {
+        this.worker.onmessage = (e) => {
+            if (e.data.progress) {
+                UIManager.updateProgress(e.data.progress);
+                return;
+            }
+
+            if (e.data.error) {
+                UIManager.showError(e.data.error);
+            } else {
+                UIManager.showResult(e.data.result);
+            }
         };
-        worker.postMessage({ 
-            text: inputText,
+
+        this.worker.onerror = (error) => {
+            UIManager.showError('Error en el Worker: ' + error.message);
+        };
+    }
+
+    static handleProcess(text, options) {
+        if (!text.trim()) {
+            alert('¡Ingresa un texto primero!');
+            return;
+        }
+
+        UIManager.toggleLoading(true);
+        this.worker.postMessage({
+            text: text,
             lang: document.getElementById('languageSelect').value,
             options: options
         });
-    });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => App.init());
 });
